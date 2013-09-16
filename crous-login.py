@@ -25,6 +25,7 @@ def login(user, password):
 
     print "Got the form..."
 
+    # Do the POST to: <the same site we connected>/webauth/loginprocess
     payload = { "user": user, "pass": password }
     r = requests.post("http://google.com/webauth/loginprocess", data=payload)
 

@@ -12,10 +12,10 @@ load_power_supplies() {
 		i_dir=$(dirname $i)
 		i_type=$(cat $i)
 
-		if [ "$i_type"x = "Batteryx" ]; then
+		if [ "$i_type" = "Battery" ]; then
 			BATS="$BATS $i_dir"
 		fi
-		if [ "$i_type"x = "Mainsx" ]; then
+		if [ "$i_type" = "Mains" ]; then
 			ADPS="$ADPS $i_dir"
 		fi
 	done
@@ -27,7 +27,7 @@ detect_curr_supply() {
 	running_on="BAT"
 
 	for ac in $ADPS; do
-		if cat ${ac}/online | grep -q 1; then
+		if [ $(cat ${ac}/online) -eq 1 ]; then
 			running_on="AC"
 			return
 		fi
