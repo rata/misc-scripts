@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+#
+# notifyme - Run any command and open an X window to notify when it finishes
+# Rodrigo Campos <rodrigo@sdfg.com.ar>
+#
+# $1..$N: the command you want to run and its arguments
+#
+# For example, run like this:
+# 	notifyme make
+#
+# And it will open an X window when the command finishes. You can also click on
+# snooze to be notified again in 1 minute.
+#
+# It uses xmessage, present in x11-utils, so you probably already have it.
+
+eval "$@"
+ret=$?
+
+notify_cmd="xmessage -nearmouse -buttons okay:0,snooze:2 Finished with retcode $ret when running: $@"
+until $notify_cmd; do
+	sleep 60
+done

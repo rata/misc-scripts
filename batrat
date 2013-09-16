@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+#
+# batrat - Detect switches from AC to BAT or viceversa and print them to stdout
+# Rodrigo Campos <rodrigo@sdfg.com.ar>
+
+# Creates the var BATS with a list of the paths to the BAT dir in
+# /sys/class/power_supply/ and also creates the var ADPS with a list of the
+# paths to the ADP dir in /sys/class/power_supply/
+load_power_supplies() {
+	for i in /sys/class/power_supply/*/type; do
+
+		i_dir=$(dirname $i)
+		i_type=$(cat $i)
+
+		if [ "$i_type"x = "Batteryx" ]; then
+			BATS="$BATS $i_dir"
+		fi
+		if [ "$i_type"x = "Mainsx" ]; then
+			ADPS="$ADPS $i_dir"
+		fi
+	done
+}
+
+# sets running_on
+detect_curr_supply() {
+	load_power_supplies
+	running_on="BAT"
+
+	for ac in $ADPS; do
+		if cat ${ac}/online | grep -q 1; then
+			running_on="AC"
+			return
+		fi
+	done
+}
+
+supply_change() {
+	detect_curr_supply
+	echo $running_on
+
+	while inotifywait -qq -e access /sys/class/power_supply/*/online; do
+		detect_curr_supply
+		echo $running_on
+	done
+}
+
+supply_change
